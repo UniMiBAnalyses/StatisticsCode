@@ -1,6 +1,5 @@
 import ROOT as rt
 from math import *
-from collections import namedtuple
 
 #s = 1,10,100,1000
 

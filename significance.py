@@ -26,13 +26,13 @@ sigma1000 = rt.TF1("sigma1000","(1000.)/sqrt(x)",0.,4e06)
 var1000 = rt.TF1("var1000","sqrt(2)*sqrt(((1000.)+x)*log(1+(1000.)/x)-(1000.))", 0., 4e06)
 ratio1000 = rt.TF1("ratio1000","((1000.)/sqrt(x)) / (sqrt(2)*sqrt(((1000.)+x)*log(1+(1000.)/x)-(1000.)))",0.,4e06)
 
-sigma2d = rt.TF2("sigma2d", "(y/sqrt(x)) / (sqrt(2)*sqrt((y+x)*log(1+y/x)-y))", 0.,400,0.,400) #y=sig, x=bkg
+sigmaRatio2d = rt.TF2("sigmaRatio2d", "(y/sqrt(x)) / (sqrt(2)*sqrt((y+x)*log(1+y/x)-y))", 0.,400,0.,40) #y=sig, x=bkg
 
 gr = rt.TGraph()
 gr.SetPoint(0,0,0)
 gr.SetPoint(1,0,0.0000001)
 gr.SetPoint(2,1000000,0)
-gr.SetTitle("#Sigma_{1} / #Sigma_{2}")
+gr.SetTitle("#sigma_{1} / #sigma_{2}")
 
 gr1 = rt.TGraph()
 gr1.SetPoint(0,0,0.9)
@@ -218,9 +218,14 @@ l1000.Draw("SAME")
 c1000.SaveAs("sigma1000.png")
 
 c2.cd()
-gr.Draw("AP")
-sigma2d.SetContour(10000)
-sigma2d.Draw("COLZ2 L SAME")
-c2.SaveAs("sigma2d.png")
+sigmaRatio2d.SetTitle("#sigma_{expanded} / #sigma_{simple}")
+sigmaRatio2d.SetContour(30)
+sigmaRatio2d.Draw("colz2")
+sigmaRatio2d.GetXaxis().SetTitle("background events")
+sigmaRatio2d.GetYaxis().SetTitle("signal events")
+sigmaRatio2d.SetMaximum(3)
+sigmaRatio2d.SetMinimum(1)
+ 
+c2.SaveAs("sigmaRatio2d.png")
     
 

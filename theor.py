@@ -19,6 +19,7 @@ if __name__ == '__main__':
     print ''
     print '                 cut =', opt.cut
     print '             dynamic =', opt.dynamic
+    print ''
     
     f = ROOT.TFile('latino_WpWpJJ_EWK.root')
     t = f.Get('latino')
@@ -42,33 +43,32 @@ if __name__ == '__main__':
 
     hN = ROOT.TH1F('hN', '', 3, -0.5, 2.5)
     hD = ROOT.TH1F('hD', '', 3, -0.5, 2.5)
-    gr = ROOT.TGraphAsymmErrors() 
+    gr = ROOT.TGraphAsymmErrors()
+    gr_norm = ROOT.TGraphAsymmErrors()
 
-    for i in range (0,10):
+    for i in range (0,100):
         if opt.cut == 'jv':
             x_cut = i
             cut = '(std_vector_jet_pt[2]<{})'.format(x_cut)
         elif opt.cut == 'cjv':
             x_cut = i
-            cut = '(std_vector_jet_pt[2]<{} \
-            || (std_vector_jet_pt[2]>={} \
+            cut = '(std_vector_jet_pt[2]<{} || (std_vector_jet_pt[2]>={} \
             && std_vector_jet_eta[2] <  \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[0]+(std_vector_jet_eta[0]>= \
             std_vector_jet_eta[1])*std_vector_jet_eta[1]) || std_vector_jet_eta[2] > \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[1]+(std_vector_jet_eta[0]>= \
-            std_vector_jet_eta[1])*std_vector_jet_eta[0]) ))'.format(x_cut)
+            std_vector_jet_eta[1])*std_vector_jet_eta[0]) ))'.format(x_cut,x_cut)
         elif opt.cut == 'djv':
             x_cut = i*0.002
             cut = '(std_vector_jet_pt[2]<{}*{})'.format(x_cut,opt.dynamic)
         elif opt.cut == 'dcjv':
             x_cut = i*0.002
-            cut = '(std_vector_jet_pt[2]<{}*{} \
-            || (std_vector_jet_pt[2]>={}*{} \
-            && std_vector_jet_eta[2] <  \
+            cut = '(std_vector_jet_pt[2]<{}*{} || (std_vector_jet_pt[2]>={}*{} \
+            && std_vector_jet_eta[2] < \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[0]+(std_vector_jet_eta[0]>= \
             std_vector_jet_eta[1])*std_vector_jet_eta[1]) || std_vector_jet_eta[2] > \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[1]+(std_vector_jet_eta[0]>= \
-            std_vector_jet_eta[1])*std_vector_jet_eta[0]) ))'.format(x_cut,opt.dynamic)
+            std_vector_jet_eta[1])*std_vector_jet_eta[0])))'.format(x_cut,opt.dynamic,x_cut,opt.dynamic)
         for j in range(0,9):
             t.Draw('1 >> hN', presel+'*'+weights+'*'+cut+'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
             t.Draw('1 >> hD', presel+'*'+weights +'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
@@ -84,12 +84,24 @@ if __name__ == '__main__':
         gr.SetPoint(i, x_cut, eff)
         gr.SetPointEYlow(i, eff-effmin)
         gr.SetPointEYhigh(i, effmax-eff)
-        print eff, effmin, effmax
+        gr_norm.SetPoint(i, x_cut, 1)
+        gr_norm.SetPointEYlow(i, (eff-effmin)/eff)
+        gr_norm.SetPointEYhigh(i, (effmax-eff)/eff)        
+        print 'punto #', i, '--', eff, effmin, effmax
         
     gr.SetMarkerStyle(20)
     gr.SetMarkerColor(ROOT.kRed)
+    gr_norm.SetMarkerStyle(20)
+    gr_norm.SetMarkerColor(ROOT.kRed)
          
     canva = ROOT.TCanvas('canva', "", 100, 200, 700, 500)
     canva.cd()
     gr.Draw('AP')
-    canva.SaveAs('efficiency.png')
+    canva.SaveAs('{}_efficiency.png'.format(opt.cut))
+    canva.SaveAs('{}_efficiency.root'.format(opt.cut))
+    
+    canva_norm = ROOT.TCanvas('canva_norm', "", 100, 200, 700, 500)
+    canva_norm.cd()
+    gr_norm.Draw('AP')
+    canva_norm.SaveAs('{}_efficiency_norm.png'.format(opt.cut))
+    canva_norm.SaveAs('{}_efficiency_norm.root'.format(opt.cut))

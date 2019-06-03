@@ -82,8 +82,9 @@ if __name__ == '__main__':
             if efficiency < effmin:
                 effmin = efficiency
         gr.SetPoint(i, x_cut, eff)
-        gr.SetPointEYlow(i, effmin)
-        gr.SetPointEYhigh(i, effmax)
+        gr.SetPointEYlow(i, eff-effmin)
+        gr.SetPointEYhigh(i, effmax-eff)
+        print eff, effmin, effmax
         
     gr.SetMarkerStyle(20)
     gr.SetMarkerColor(ROOT.kRed)

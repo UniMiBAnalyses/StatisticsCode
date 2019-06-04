@@ -112,38 +112,38 @@ if __name__ == '__main__':
                 eff = efficiency
                 effmax = efficiency
                 effmin = efficiency
-                numerator0.SetPoint(i, x_cut, hN.Integral())
-                denominator0.SetPoint(i, x_cut, hD.Integral())
+                numerator0.SetPoint(i-start, x_cut, hN.Integral())
+                denominator0.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 1:
-                numerator1.SetPoint(i, x_cut, hN.Integral())
-                denominator1.SetPoint(i, x_cut, hD.Integral())
+                numerator1.SetPoint(i-start, x_cut, hN.Integral())
+                denominator1.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 2:
-                numerator2.SetPoint(i, x_cut, hN.Integral())
-                denominator2.SetPoint(i, x_cut, hD.Integral())
+                numerator2.SetPoint(i-start, x_cut, hN.Integral())
+                denominator2.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 3:
-                numerator3.SetPoint(i, x_cut, hN.Integral())
-                denominator3.SetPoint(i, x_cut, hD.Integral())
+                numerator3.SetPoint(i-start, x_cut, hN.Integral())
+                denominator3.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 4:
-                numerator4.SetPoint(i, x_cut, hN.Integral())
-                denominator4.SetPoint(i, x_cut, hD.Integral())
+                numerator4.SetPoint(i-start, x_cut, hN.Integral())
+                denominator4.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 6:
-                numerator6.SetPoint(i, x_cut, hN.Integral())
-                denominator6.SetPoint(i, x_cut, hD.Integral())
+                numerator6.SetPoint(i-start, x_cut, hN.Integral())
+                denominator6.SetPoint(i-start, x_cut, hD.Integral())
             elif j == 8:
-                numerator8.SetPoint(i, x_cut, hN.Integral())
-                denominator8.SetPoint(i, x_cut, hD.Integral())
+                numerator8.SetPoint(i-start, x_cut, hN.Integral())
+                denominator8.SetPoint(i-start, x_cut, hD.Integral())
             if efficiency > effmax:
                 effmax = efficiency
             if efficiency < effmin:
                 effmin = efficiency
             
-        efficiencies.SetPoint(i, x_cut, eff)
-        efficiencies.SetPointEYlow(i, eff-effmin)
-        efficiencies.SetPointEYhigh(i, effmax-eff)
-        efficiencies_norm.SetPoint(i, x_cut, 1)
-        efficiencies_norm.SetPointEYlow(i, (eff-effmin)/eff)
-        efficiencies_norm.SetPointEYhigh(i, (effmax-eff)/eff)        
-        print 'punto #', i, '--', eff, effmin, effmax
+        efficiencies.SetPoint(i-start, x_cut, eff)
+        efficiencies.SetPointEYlow(i-start, eff-effmin)
+        efficiencies.SetPointEYhigh(i-start, effmax-eff)
+        efficiencies_norm.SetPoint(i-start, x_cut, 1)
+        efficiencies_norm.SetPointEYlow(i-start, (eff-effmin)/eff)
+        efficiencies_norm.SetPointEYhigh(i-start, (effmax-eff)/eff)        
+        print 'punto #', i-start, '--', eff, effmin, effmax
        
     if opt.cut == 'jv':
         efficiencies.SetFillColor(ROOT.kBlue+2)

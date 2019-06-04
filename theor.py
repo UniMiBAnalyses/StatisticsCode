@@ -43,9 +43,23 @@ if __name__ == '__main__':
 
     hN = ROOT.TH1F('hN', '', 3, -0.5, 2.5)
     hD = ROOT.TH1F('hD', '', 3, -0.5, 2.5)
-    gr = ROOT.TGraphAsymmErrors()
-    gr_norm = ROOT.TGraphAsymmErrors()
-
+    efficiencies = ROOT.TGraphAsymmErrors()
+    efficiencies_norm = ROOT.TGraphAsymmErrors()
+    numerator0 = ROOT.TGraph()
+    denominator0 = ROOT.TGraph()
+    numerator1 = ROOT.TGraph()
+    denominator1 = ROOT.TGraph()
+    numerator2 = ROOT.TGraph()
+    denominator2 = ROOT.TGraph()
+    numerator3 = ROOT.TGraph()
+    denominator3 = ROOT.TGraph()
+    numerator4 = ROOT.TGraph()
+    denominator4 = ROOT.TGraph()
+    numerator6 = ROOT.TGraph()
+    denominator6 = ROOT.TGraph()
+    numerator8 = ROOT.TGraph()
+    denominator8 = ROOT.TGraph()
+    
     for i in range (0,100):
         if opt.cut == 'jv':
             x_cut = i
@@ -77,31 +91,81 @@ if __name__ == '__main__':
                 eff = efficiency
                 effmax = efficiency
                 effmin = efficiency
+                numerator0.SetPoint(i, x_cut, hN.Integral())
+                denominator0.SetPoint(i, x_cut, hD.Integral())
+            elif j == 1:
+                numerator1.SetPoint(i, x_cut, hN.Integral())
+                denominator1.SetPoint(i, x_cut, hD.Integral())
+            elif j == 2:
+                numerator2.SetPoint(i, x_cut, hN.Integral())
+                denominator2.SetPoint(i, x_cut, hD.Integral())
+            elif j == 3:
+                numerator3.SetPoint(i, x_cut, hN.Integral())
+                denominator3.SetPoint(i, x_cut, hD.Integral())
+            elif j == 4:
+                numerator4.SetPoint(i, x_cut, hN.Integral())
+                denominator4.SetPoint(i, x_cut, hD.Integral())
+            elif j == 6:
+                numerator6.SetPoint(i, x_cut, hN.Integral())
+                denominator6.SetPoint(i, x_cut, hD.Integral())
+            elif j == 8:
+                numerator8.SetPoint(i, x_cut, hN.Integral())
+                denominator8.SetPoint(i, x_cut, hD.Integral())
             if efficiency > effmax:
                 effmax = efficiency
             if efficiency < effmin:
                 effmin = efficiency
-        gr.SetPoint(i, x_cut, eff)
-        gr.SetPointEYlow(i, eff-effmin)
-        gr.SetPointEYhigh(i, effmax-eff)
-        gr_norm.SetPoint(i, x_cut, 1)
-        gr_norm.SetPointEYlow(i, (eff-effmin)/eff)
-        gr_norm.SetPointEYhigh(i, (effmax-eff)/eff)        
+            
+        efficiencies.SetPoint(i, x_cut, eff)
+        efficiencies.SetPointEYlow(i, eff-effmin)
+        efficiencies.SetPointEYhigh(i, effmax-eff)
+        efficiencies_norm.SetPoint(i, x_cut, 1)
+        efficiencies_norm.SetPointEYlow(i, (eff-effmin)/eff)
+        efficiencies_norm.SetPointEYhigh(i, (effmax-eff)/eff)        
         print 'punto #', i, '--', eff, effmin, effmax
-        
-    gr.SetMarkerStyle(20)
-    gr.SetMarkerColor(ROOT.kRed)
-    gr_norm.SetMarkerStyle(20)
-    gr_norm.SetMarkerColor(ROOT.kRed)
+       
+    if opt.cut == 'jv':
+        efficiencies.SetFillColor(ROOT.kBlue+2)
+        efficiencies_norm.SetFillColor(ROOT.kBlue+2)
+    elif opt.cut == 'cjv':
+        efficiencies.SetFillColor(ROOT.kRed+1)
+        efficiencies_norm.SetFillColor(ROOT.kRed+1)   
+    elif opt.cut == 'djv':
+        efficiencies.SetFillColor(ROOT.kGreen+2)
+        efficiencies_norm.SetFillColor(ROOT.kGreen+2)
+    elif opt.cut == 'dcjv':
+        efficiencies.SetFillColor(ROOT.kPink)
+        efficiencies_norm.SetFillColor(ROOT.kPink) 
+    #efficiencies.SetMarkerStyle(20)
+    #efficiencies.SetMarkerColor(ROOT.kRed)
+    #efficiencies_norm.SetMarkerStyle(20)
+    #efficiencies_norm.SetMarkerColor(ROOT.kRed)
+
+    outfile = ROOT.TFile('{}_eff.root'.format(opt.cut), 'RECREATE')
+    
+    efficiencies.Write()
+    efficiencies_norm.Write()
+    numerator0.Write()
+    denominator0.Write()
+    numerator1.Write()
+    denominator1.Write()
+    numerator2.Write()
+    denominator2.Write()
+    numerator3.Write()
+    denominator3.Write()
+    numerator4.Write()
+    denominator4.Write()
+    numerator6.Write()
+    denominator6.Write()
+    numerator8.Write()
+    denominator8.Write()
          
     canva = ROOT.TCanvas('canva', "", 100, 200, 700, 500)
     canva.cd()
-    gr.Draw('AP')
-    canva.SaveAs('{}_efficiency.png'.format(opt.cut))
-    canva.SaveAs('{}_efficiency.root'.format(opt.cut))
+    efficiencies.Draw('AP4')
+    canva.SaveAs('{}_eff.png'.format(opt.cut))
     
     canva_norm = ROOT.TCanvas('canva_norm', "", 100, 200, 700, 500)
     canva_norm.cd()
-    gr_norm.Draw('AP')
-    canva_norm.SaveAs('{}_efficiency_norm.png'.format(opt.cut))
-    canva_norm.SaveAs('{}_efficiency_norm.root'.format(opt.cut))
+    efficiencies_norm.Draw('AP4')
+    canva_norm.SaveAs('{}_eff_norm.png'.format(opt.cut))

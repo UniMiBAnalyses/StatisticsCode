@@ -44,23 +44,44 @@ if __name__ == '__main__':
     hN = ROOT.TH1F('hN', '', 3, -0.5, 2.5)
     hD = ROOT.TH1F('hD', '', 3, -0.5, 2.5)
     efficiencies = ROOT.TGraphAsymmErrors()
+    efficiencies.SetName('efficiencies')
     efficiencies_norm = ROOT.TGraphAsymmErrors()
+    efficiencies_norm.SetName('efficiencies_norm')
     numerator0 = ROOT.TGraph()
+    numerator0.SetName('numerator0')
     denominator0 = ROOT.TGraph()
+    denominator0.SetName('denominator0')
     numerator1 = ROOT.TGraph()
+    numerator1.SetName('numerator1')
     denominator1 = ROOT.TGraph()
+    denominator1.SetName('denominator1')
     numerator2 = ROOT.TGraph()
+    numerator2.SetName('numerator2')
     denominator2 = ROOT.TGraph()
+    denominator2.SetName('denominator2')
     numerator3 = ROOT.TGraph()
+    numerator3.SetName('numerator3')
     denominator3 = ROOT.TGraph()
+    denominator3.SetName('denominator3')
     numerator4 = ROOT.TGraph()
+    numerator4.SetName('numerator4')
     denominator4 = ROOT.TGraph()
+    denominator4.SetName('denominator4')
     numerator6 = ROOT.TGraph()
+    numerator6.SetName('numerator6')
     denominator6 = ROOT.TGraph()
+    denominator6.SetName('denominator6')
     numerator8 = ROOT.TGraph()
+    numerator8.SetName('numerator8')
     denominator8 = ROOT.TGraph()
+    denominator8.SetName('denominator8')
     
-    for i in range (0,100):
+    if (opt.cut == 'jv') or (opt.cut == 'cjv'):
+        start = 20
+    else:
+        start = 0
+        
+    for i in range (start,100):
         if opt.cut == 'jv':
             x_cut = i
             cut = '(std_vector_jet_pt[2]<{})'.format(x_cut)
@@ -126,16 +147,36 @@ if __name__ == '__main__':
        
     if opt.cut == 'jv':
         efficiencies.SetFillColor(ROOT.kBlue+2)
+        efficiencies_norm.SetLineColor(ROOT.kBlue)
         efficiencies_norm.SetFillColor(ROOT.kBlue+2)
+        efficiencies.GetXaxis().SetTitle('p_{t} jet 3 [GeV]')
+        efficiencies_norm.GetXaxis().SetTitle('p_{t} jet 3 [GeV]')
     elif opt.cut == 'cjv':
         efficiencies.SetFillColor(ROOT.kRed+1)
-        efficiencies_norm.SetFillColor(ROOT.kRed+1)   
+        efficiencies_norm.SetLineColor(ROOT.kRed)
+        efficiencies_norm.SetFillColor(ROOT.kRed+1)
+        efficiencies.GetXaxis().SetTitle('p_{t} jet 3 [GeV]')
+        efficiencies_norm.GetXaxis().SetTitle('p_{t} jet 3 [GeV]')
     elif opt.cut == 'djv':
         efficiencies.SetFillColor(ROOT.kGreen+2)
+        efficiencies_norm.SetLineColor(ROOT.kGreen)
         efficiencies_norm.SetFillColor(ROOT.kGreen+2)
+        efficiencies.GetXaxis().SetTitle('r')
+        efficiencies_norm.GetXaxis().SetTitle('r')
     elif opt.cut == 'dcjv':
-        efficiencies.SetFillColor(ROOT.kPink)
-        efficiencies_norm.SetFillColor(ROOT.kPink) 
+        efficiencies.SetFillColor(ROOT.kPink-9)
+        efficiencies_norm.SetLineColor(ROOT.kPink-8)
+        efficiencies_norm.SetFillColor(ROOT.kPink-9)
+        efficiencies.GetXaxis().SetTitle('r')
+        efficiencies_norm.GetXaxis().SetTitle('r')
+    
+    efficiencies.GetXaxis().SetTitleSize(0.04)
+    efficiencies_norm.GetXaxis().SetTitleSize(0.04)
+    efficiencies.GetYaxis().SetTitle('#varepsilon')
+    efficiencies.GetYaxis().SetTitleSize(0.045)
+    efficiencies.GetYaxis().SetTitleOffset(0.8)
+    efficiencies_norm.SetFillStyle(3001)
+    efficiencies_norm.SetLineWidth(2)
     #efficiencies.SetMarkerStyle(20)
     #efficiencies.SetMarkerColor(ROOT.kRed)
     #efficiencies_norm.SetMarkerStyle(20)
@@ -162,10 +203,10 @@ if __name__ == '__main__':
          
     canva = ROOT.TCanvas('canva', "", 100, 200, 700, 500)
     canva.cd()
-    efficiencies.Draw('AP4')
+    efficiencies.Draw('AP4C')
     canva.SaveAs('{}_eff.png'.format(opt.cut))
     
     canva_norm = ROOT.TCanvas('canva_norm', "", 100, 200, 700, 500)
     canva_norm.cd()
-    efficiencies_norm.Draw('AP4')
+    efficiencies_norm.Draw('AP4C')
     canva_norm.SaveAs('{}_eff_norm.png'.format(opt.cut))

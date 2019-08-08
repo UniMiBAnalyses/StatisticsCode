@@ -60,6 +60,8 @@ if __name__ == '__main__':
         g.SetPointError(i, 0, err)
         g_norm.SetPoint(i, x_cut[i], 1)
         g_norm.SetPointError(i, 0, err/(1-notpass0/tot0[i]))
+        if (x_cut[i] < 31 and x_cut[i] > 24) or (x_cut[i] < 0.041 and x_cut[i] > 0.03):
+            print 'cut =', x_cut[i], 'efficiency =', 1 - notpass0/tot0[i], 'error =', 100*err/(1 - notpass0/tot0[i])
 
     if infile[:-9] == 'jv':
         g.SetFillColor(ROOT.kBlue+2)
@@ -77,17 +79,19 @@ if __name__ == '__main__':
         g.SetFillColor(ROOT.kGreen+2)
         g_norm.SetLineColor(ROOT.kGreen)
         g_norm.SetFillColor(ROOT.kGreen+2)
-        g.GetXaxis().SetTitle('r')
-        g_norm.GetXaxis().SetTitle('r')
+        g.GetXaxis().SetTitle('D_{c}')
+        g_norm.GetXaxis().SetTitle('D_{c}')
     elif infile[:-9] == 'dcjv':
         g.SetFillColor(ROOT.kPink-9)
         g_norm.SetLineColor(ROOT.kPink-8)
         g_norm.SetFillColor(ROOT.kPink-9)
-        g.GetXaxis().SetTitle('r')
-        g_norm.GetXaxis().SetTitle('r')
+        g.GetXaxis().SetTitle('D_{c}')
+        g_norm.GetXaxis().SetTitle('D_{c}')
     
+    g_norm.GetYaxis().SetTitle('Normalized #varepsilon')
     g.GetXaxis().SetTitleSize(0.04)
     g_norm.GetXaxis().SetTitleSize(0.04)
+    g_norm.GetYaxis().SetTitleSize(0.045)
     g.GetYaxis().SetTitle('#varepsilon')
     g.GetYaxis().SetTitleSize(0.045)
     g.GetYaxis().SetTitleOffset(0.8)
@@ -102,10 +106,15 @@ if __name__ == '__main__':
     
     canva = ROOT.TCanvas('canva', "", 100, 200, 700, 500)
     canva.cd()
+    g.GetYaxis().SetRangeUser(0,1)
     g.Draw('AP4C')
     canva.SaveAs('{}_ST.png'.format(infile[:-9]))
     
     canva_norm = ROOT.TCanvas('canva_norm', "", 100, 200, 700, 500)
     canva_norm.cd()
+    if (infile[:-9]=='jv') or (infile[:-9]=='djv'):
+        g_norm.GetYaxis().SetRangeUser(0.6,1.4)
+    elif (infile[:-9]=='cjv') or (infile[:-9]=='dcjv'):
+        g_norm.GetYaxis().SetRangeUser(0.85,1.15)
     g_norm.Draw('AP4C')
     canva_norm.SaveAs('{}_norm_ST.png'.format(infile[:-9]))

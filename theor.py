@@ -40,6 +40,8 @@ if __name__ == '__main__':
     *std_vector_trigger_special[5])*(((std_vector_trigger_special[8]==-2.)*(std_vector_trigger_special[6] \
     *std_vector_trigger_special[7])) || ((! (std_vector_trigger_special[8]==-2.))*(std_vector_trigger_special[8] \
     *std_vector_trigger_special[9])))*((std_vector_lepton_flavour[0] * std_vector_lepton_flavour[1])>0)*1.067466)'
+    
+    ptcond = '(std_vector_jet_pt[2]>=20)'
 
     hN = ROOT.TH1F('hN', '', 3, -0.5, 2.5)
     hD = ROOT.TH1F('hD', '', 3, -0.5, 2.5)
@@ -77,11 +79,18 @@ if __name__ == '__main__':
     denominator8.SetName('denominator8')
     
     if (opt.cut == 'jv') or (opt.cut == 'cjv'):
-        start = 20
+        start = 21
     else:
         start = 0
-        
-    for i in range (start,100):
+    #if opt.cut == 'dcjv':
+        #end = 115
+    #else:
+        #end = 100
+    if (opt.cut == 'djv') or (opt.cut == 'dcjv'):
+        start = 10
+    end = 100
+                
+    for i in range (start,end):
         if opt.cut == 'jv':
             x_cut = i
             cut = '(std_vector_jet_pt[2]<{})'.format(x_cut)
@@ -93,10 +102,17 @@ if __name__ == '__main__':
             std_vector_jet_eta[1])*std_vector_jet_eta[1]) || std_vector_jet_eta[2] > \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[1]+(std_vector_jet_eta[0]>= \
             std_vector_jet_eta[1])*std_vector_jet_eta[0]) ))'.format(x_cut,x_cut)
-        elif opt.cut == 'djv':
+        elif opt.cut == 'djv' and opt.dynamic == 'mjj':
             x_cut = i*0.002
             cut = '(std_vector_jet_pt[2]<{}*{})'.format(x_cut,opt.dynamic)
-        elif opt.cut == 'dcjv':
+        elif opt.cut == 'djv' and opt.dynamic != 'mjj':
+            x_cut = i*0.01
+            cut = '(std_vector_jet_pt[2]<{}*{})'.format(x_cut,opt.dynamic)
+        elif opt.cut == 'dcjv' and opt.dynamic == 'mjj':
+            #if i <= 25:
+                #x_cut = i*0.0008
+            #else:
+                #x_cut = 0.02+(i-25)*0.002
             x_cut = i*0.002
             cut = '(std_vector_jet_pt[2]<{}*{} || (std_vector_jet_pt[2]>={}*{} \
             && std_vector_jet_eta[2] < \
@@ -104,9 +120,22 @@ if __name__ == '__main__':
             std_vector_jet_eta[1])*std_vector_jet_eta[1]) || std_vector_jet_eta[2] > \
             ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[1]+(std_vector_jet_eta[0]>= \
             std_vector_jet_eta[1])*std_vector_jet_eta[0])))'.format(x_cut,opt.dynamic,x_cut,opt.dynamic)
+        elif opt.cut == 'dcjv' and opt.dynamic != 'mjj':
+            x_cut = i*0.0086
+            cut = '(std_vector_jet_pt[2]<{}*{} || (std_vector_jet_pt[2]>={}*{} \
+            && std_vector_jet_eta[2] < \
+            ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[0]+(std_vector_jet_eta[0]>= \
+            std_vector_jet_eta[1])*std_vector_jet_eta[1]) || std_vector_jet_eta[2] > \
+            ((std_vector_jet_eta[0]<std_vector_jet_eta[1])*std_vector_jet_eta[1]+(std_vector_jet_eta[0]>= \
+            std_vector_jet_eta[1])*std_vector_jet_eta[0])))'.format(x_cut,opt.dynamic,x_cut,opt.dynamic)
+
         for j in range(0,9):
-            t.Draw('1 >> hN', presel+'*'+weights+'*'+cut+'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
-            t.Draw('1 >> hD', presel+'*'+weights +'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
+            if opt.cut == 'djv':
+                t.Draw('1 >> hN', presel+'*'+weights+'*'+cut+'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
+                t.Draw('1 >> hD', presel+'*'+weights +'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
+            else:
+                t.Draw('1 >> hN', presel+'*'+weights+'*'+cut+'*'+ptcond+'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
+                t.Draw('1 >> hD', presel+'*'+weights +'*'+ptcond+'*(std_vector_LHE_weight[{}]/std_vector_LHE_weight[0])'.format(j))
             efficiency = hN.Integral() / hD.Integral()
             if j == 0:
                 eff = efficiency
@@ -136,7 +165,7 @@ if __name__ == '__main__':
                 effmax = efficiency
             if efficiency < effmin:
                 effmin = efficiency
-            
+ 
         efficiencies.SetPoint(i-start, x_cut, eff)
         efficiencies.SetPointEYlow(i-start, eff-effmin)
         efficiencies.SetPointEYhigh(i-start, effmax-eff)
@@ -144,7 +173,10 @@ if __name__ == '__main__':
         efficiencies_norm.SetPointEYlow(i-start, (eff-effmin)/eff)
         efficiencies_norm.SetPointEYhigh(i-start, (effmax-eff)/eff)        
         print 'punto #', i-start, '--', eff, effmin, effmax
-       
+        if (x_cut < 31 and x_cut > 24) or (x_cut < 0.041 and x_cut > 0.03):
+            print 'cut =', x_cut, 'efficiency =', eff, 'error =', 100*max(eff-effmin, effmax-eff)/eff
+
+        
     if opt.cut == 'jv':
         efficiencies.SetFillColor(ROOT.kBlue+2)
         efficiencies_norm.SetLineColor(ROOT.kBlue)
@@ -161,17 +193,19 @@ if __name__ == '__main__':
         efficiencies.SetFillColor(ROOT.kGreen+2)
         efficiencies_norm.SetLineColor(ROOT.kGreen)
         efficiencies_norm.SetFillColor(ROOT.kGreen+2)
-        efficiencies.GetXaxis().SetTitle('r')
-        efficiencies_norm.GetXaxis().SetTitle('r')
+        efficiencies.GetXaxis().SetTitle('k')
+        efficiencies_norm.GetXaxis().SetTitle('k')
     elif opt.cut == 'dcjv':
         efficiencies.SetFillColor(ROOT.kPink-9)
         efficiencies_norm.SetLineColor(ROOT.kPink-8)
         efficiencies_norm.SetFillColor(ROOT.kPink-9)
-        efficiencies.GetXaxis().SetTitle('r')
-        efficiencies_norm.GetXaxis().SetTitle('r')
+        efficiencies.GetXaxis().SetTitle('k_{d}')
+        efficiencies_norm.GetXaxis().SetTitle('k_{d}')
     
+    efficiencies_norm.GetYaxis().SetTitle('Normalized #varepsilon')
     efficiencies.GetXaxis().SetTitleSize(0.04)
     efficiencies_norm.GetXaxis().SetTitleSize(0.04)
+    efficiencies_norm.GetYaxis().SetTitleSize(0.045)
     efficiencies.GetYaxis().SetTitle('#varepsilon')
     efficiencies.GetYaxis().SetTitleSize(0.045)
     efficiencies.GetYaxis().SetTitleOffset(0.8)
@@ -205,8 +239,14 @@ if __name__ == '__main__':
     canva.cd()
     efficiencies.Draw('AP4C')
     canva.SaveAs('{}_eff.png'.format(opt.cut))
+    canva.SaveAs('CANVA{}_eff.root'.format(opt.cut))
     
     canva_norm = ROOT.TCanvas('canva_norm', "", 100, 200, 700, 500)
     canva_norm.cd()
+    if (opt.cut=='jv') or (opt.cut=='djv'):
+        efficiencies_norm.GetYaxis().SetRangeUser(0.885,1.115)
+    elif (opt.cut=='cjv') or (opt.cut=='dcjv'):
+        efficiencies_norm.GetYaxis().SetRangeUser(0.9915,1.0085)
     efficiencies_norm.Draw('AP4C')
     canva_norm.SaveAs('{}_eff_norm.png'.format(opt.cut))
+    canva_norm.SaveAs('CANVA{}_eff_norm.root'.format(opt.cut))
